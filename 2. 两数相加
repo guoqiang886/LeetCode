@@ -21,7 +21,7 @@
  */
 class Solution {
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        // 尾插法创建链表，两数求按位求和的思想也用到了这里
+        // 尾插法创建链表，两数按位求和的思想也用到了这里
         ListNode result = new ListNode(0);
         ListNode node = result;
         int sum = 0;
