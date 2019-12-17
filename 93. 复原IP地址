@@ -1,0 +1,35 @@
+给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。
+
+示例:
+
+输入: "25525511135"
+输出: ["255.255.11.135", "255.255.111.35"]
+
+-------------------------------------Code----------------------------------------------
+class Solution {
+    public List<String> restoreIpAddresses(String s) {
+        // 1、暴力解法   2、回溯
+        // 下面使用递归的方法
+        List<String> res = new ArrayList<String>();
+        restore(s, res, 4, "");
+        return res;
+    }
+    
+    public void restore(String s, List<String> res, int k, String out) {
+        if (k == 0) {
+            if (s.isEmpty()) res.add(out);
+        } else {
+            for (int i = 1; i < 4; i++) {
+                if (i > s.length() || (s.substring(0, i).length() > 1 && s.substring(0, i).charAt(0) == '0')) break;
+                String str = s.substring(0, i);
+                if (Integer.parseInt(str) >= 0 && Integer.parseInt(str) <=255) {
+                    if (k == 4) {
+                        restore(s.substring(i, s.length()), res, k-1, out+str);
+                    } else {
+                        restore(s.substring(i, s.length()), res, k-1, out+"."+str);
+                    }
+                }
+            }
+        }
+    }
+}
