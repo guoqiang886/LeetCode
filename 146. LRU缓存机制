@@ -1,0 +1,121 @@
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+
+获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+
+进阶:
+
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+
+示例:
+
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+
+---------------------------------------------Code--------------------------------------------------
+class LRUCache {
+    /*
+    * 利用双向链表和Hash表实现LRU缓存机制
+    * 有很多细节需要动手去实现了才能理解
+    * 另外用LinkedHashMap也可以实现LRU缓存
+    */
+    // 双向链表的节点
+    private class DLinkednode {
+        // 注意这里必须要有key成员变量才可以
+        // 因为后续map删除变量需要根据Dlinkednode得到的key值来删除
+        public int key;
+        public int value;
+        public DLinkednode pre;
+        public DLinkednode next;
+    }
+
+    // 从链表头添加节点
+    private void addNode(DLinkednode node) {
+        node.pre = head;
+        node.next = head.next;
+
+        head.next.pre = node;
+        head.next = node;
+    }
+
+    // 删除节点
+    private void delNode(DLinkednode node) {
+        DLinkednode pre = node.pre;
+        DLinkednode next = node.next;
+
+        pre.next = next;
+        next.pre = pre;
+    }
+
+    // 将节点移动到头结点位置
+    private void moveToHead(DLinkednode node) {
+        delNode(node);
+        addNode(node);
+    }
+
+    // 删除最后一个节点
+    private DLinkednode popNode() {
+        DLinkednode res = tail.pre;
+        delNode(res);
+        return res;
+    }
+
+    // 注意这里的head，tail为虚节点，只表示双向链表的开头和结尾
+    private DLinkednode head;
+    private DLinkednode tail;
+    private HashMap<Integer, DLinkednode> map;
+    private int size;
+
+    public LRUCache(int capacity) {
+        // 初始化注意给head.next和tail.pre赋值
+        head = new DLinkednode();
+        tail = new DLinkednode();
+        head.next = tail;
+        tail.pre = head;
+
+        size = capacity;
+        map = new HashMap<Integer, DLinkednode>();
+    }
+    
+    public int get(int key) {
+        if (!map.containsKey(key)) return -1;
+        DLinkednode node = map.get(key);
+        moveToHead(node);
+        return node.value;
+    }
+    
+    public void put(int key, int value) {
+        if (map.containsKey(key)) {
+            // key相同时，map会覆盖原始的键值对
+            // 但是注意需要删除双向链表中对应的节点
+            // DLinkednode node = map.get(key);
+            delNode(map.get(key));
+            // map.remove(key);
+        } else if (map.size() == size) {
+            DLinkednode node = popNode();
+            map.remove(node.key);
+        }
+        DLinkednode node = new DLinkednode();
+        node.key = key;
+        node.value = value;
+        
+        addNode(node);
+        map.put(key, node);
+    }
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
