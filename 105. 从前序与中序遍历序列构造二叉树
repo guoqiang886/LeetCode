@@ -1,0 +1,60 @@
+根据一棵树的前序遍历与中序遍历构造二叉树。
+
+注意:
+你可以假设树中没有重复的元素。
+
+例如，给出
+
+前序遍历 preorder = [3,9,20,15,7]
+中序遍历 inorder = [9,3,15,20,7]
+返回如下的二叉树：
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+---------------------------------------------Code--------------------------------------------------
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    private int preIdx;
+    private int[] preorder;
+    // private int[] inorder;
+    private Map<Integer, Integer> map;
+
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        /*
+         * 先序遍历或后序遍历结合中序遍历可以得出唯一的二叉树
+         * preorder 中的第一个元素一定是树的根，这个根又将 inorder 序列分成了左右两棵子树。
+         * 现在我们只需要将先序遍历的数组中删除根元素，然后重复上面的过程处理左右两棵子树。
+         */
+        this.preorder = preorder;
+        // this.inorder = inorder;
+        this.map = new HashMap<>();
+        int index = 0;
+        for (int i : inorder) {
+            map.put(i, index++);
+        }
+        return helper(0, inorder.length - 1);
+    }
+    
+    public TreeNode helper(int start, int end) {
+        // 有点类似于二分查找
+        if (start > end) return null;
+        TreeNode root = new TreeNode(preorder[preIdx]);
+        int index = map.get(preorder[preIdx]);
+        preIdx++;
+        root.left = helper(start, index - 1);
+        root.right = helper(index + 1, end);
+        return root;
+    }
+}
