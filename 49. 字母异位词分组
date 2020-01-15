@@ -1,0 +1,39 @@
+给定一个字符串数组，将字母异位词组合在一起。字母异位词指字母相同，但排列不同的字符串。
+
+示例:
+
+输入: ["eat", "tea", "tan", "ate", "nat", "bat"],
+输出:
+[
+  ["ate","eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+说明：
+
+所有输入均为小写字母。
+不考虑答案输出的顺序。
+
+-------------------------------------Code-------------------------------------------
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        /*
+         * 主要的思路就是构建Map<String, List>的映射
+         */
+        Map<String, List> map = new HashMap<>();
+        for (String str : strs) {
+            int[] chs = new int[26];
+            for (char c : str.toCharArray()) chs[c - 'a']++;
+
+            StringBuilder sb = new StringBuilder();
+            for (int c : chs) sb.append(c).append("#");
+            
+            String s = sb.toString();
+            
+            // 这里算是一个小技巧
+            if (!map.containsKey(s)) map.put(s, new ArrayList());
+            map.get(s).add(str);
+        }
+        return new ArrayList(map.values());
+    }
+}
