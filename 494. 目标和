@@ -1,0 +1,63 @@
+给定一个非负整数数组，a1, a2, ..., an, 和一个目标数，S。现在你有两个符号 + 和 -。对于数组中的任意一个整数，你都可以从 + 或 -中选择一个符号添加在前面。
+
+返回可以使最终数组和为目标数 S 的所有添加符号的方法数。
+
+示例 1:
+
+输入: nums: [1, 1, 1, 1, 1], S: 3
+输出: 5
+解释: 
+
+-1+1+1+1+1 = 3
++1-1+1+1+1 = 3
++1+1-1+1+1 = 3
++1+1+1-1+1 = 3
++1+1+1+1-1 = 3
+
+一共有5种方法让最终目标和为3。
+注意:
+
+数组非空，且长度不会超过20。
+初始的数组的和不会超过1000。
+保证返回的最终结果能被32位整数存下。
+
+--------------------------------------------Code---------------------------------------
+class Solution {
+    
+    // private int count = 0;
+
+    public int findTargetSumWays(int[] nums, int S) {
+        // 方法一：递归进行暴力枚举,效率较低
+        // help(nums, 0, S, 0);
+        // return count;
+
+        // 方法二：动态规划
+        // dp[i][j]表示前i个数和为j的方法数，
+        // 则dp[i][j+nums[i]] += dp[i-1][j]  dp[i][j-nums[i]] += dp[i-1][j]
+        // 注意这里初始的数组的和不会超过1000，所以j的取值范围为-1000~1000
+        int[][] dp = new int[nums.length][2001];
+        dp[0][-nums[0] + 1000] = 1;
+        // 注意这里初始化的时候应该是+=1，因为可能存在nums[0] = 0的情况
+        dp[0][nums[0]+1000] += 1;
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = -1000; j <= 1000; j++) {
+                // 注意这里需要判断dp[i-1][j+1000]大于0，否则会出现数组越界的情况
+                if (dp[i-1][j+1000] > 0) {
+                    dp[i][j + nums[i] + 1000] += dp[i-1][j + 1000];
+                    dp[i][j - nums[i] + 1000] += dp[i-1][j + 1000];
+                }
+            }
+        }
+        return S > 1000 ? 0 : dp[nums.length - 1][S + 1000];
+    }
+
+    // public void help(int[] nums, int index, int S, int sum) {
+    //     // 递归出口
+    //     if (index == nums.length) {
+    //         if (sum == S) count++;
+    //         return;
+    //     }
+    //     help(nums, index + 1, S, sum + nums[index]);
+    //     help(nums, index + 1, S, sum - nums[index]);
+    // }
+}
