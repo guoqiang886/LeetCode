@@ -1,0 +1,55 @@
+给定一个范围在  1 ≤ a[i] ≤ n ( n = 数组大小 ) 的 整型数组，数组中的元素一些出现了两次，另一些只出现一次。
+
+找到所有在 [1, n] 范围之间没有出现在数组中的数字。
+
+您能在不使用额外空间且时间复杂度为O(n)的情况下完成这个任务吗? 你可以假定返回的数组不算在额外空间内。
+
+示例:
+
+输入:
+[4,3,2,7,8,2,3,1]
+
+输出:
+[5,6]
+
+------------------------------------------------Code-----------------------------------------------------
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        // 思路一：使用Hash表来保存数组nums，再找出[1, n]范围之间没有再Hash表里面的数字
+        // 使用Hash表需要额外的O(n)空间复杂度
+        // 思路二：原地修改数组
+
+        // 这是我的做法，参考官方题解，可以进行优化
+        // int index = 0;
+        // int temp;
+        // while (index < nums.length) {
+        //     if (nums[index] != (index + 1) && nums[index] != nums[nums[index] - 1]) {
+        //         temp = nums[nums[index] - 1];
+        //         nums[nums[index] - 1] = nums[index];
+        //         nums[index] = temp;
+        //     } else {
+        //         index++;
+        //     }
+        //     // System.out.println(Arrays.toString(nums));
+        // }
+        
+        // List<Integer> res = new ArrayList<>();
+        // for (int i = 0; i < nums.length; i++) {
+        //     if (nums[i] != (i + 1)) res.add(i + 1);
+        // }
+        // return res;
+
+        // 优化后做法
+        for (int i = 0; i < nums.length; i++) {
+            // 将出现过的数字对应的值标记为负数
+            int newIndex = Math.abs(nums[i]) - 1;
+            if(nums[newIndex] > 0) nums[newIndex] *= -1;
+        }
+
+        List<Integer> ans = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) ans.add(i + 1);
+        }
+        return ans; 
+    }
+}
