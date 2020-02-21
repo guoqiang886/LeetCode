@@ -1,0 +1,76 @@
+给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+注意:
+
+每个数组中的元素不会超过 100
+数组的大小不会超过 200
+示例 1:
+
+输入: [1, 5, 11, 5]
+
+输出: true
+
+解释: 数组可以分割成 [1, 5, 5] 和 [11].
+ 
+
+示例 2:
+
+输入: [1, 2, 3, 5]
+
+输出: false
+
+解释: 数组不能分割成两个元素和相等的子集.
+
+-------------------------------------------Code----------------------------------------------
+class Solution {
+    public boolean canPartition(int[] nums) {
+        /*
+         * 背包问题，类似的还有第494题，目标和
+         * 两个子集的元素和相等，即求是否有子集的元素和为数组和的一半
+         * dp[i][j]表示前i个数是否存在子集的和为j
+         * 状态转移方程dp[i][j] = dp[i-1][j-nums[i]] || dp[i-1][j]
+         */
+        int sum = 0;
+        for (int i : nums) {
+            sum += i;
+        }
+        // 位运算判断奇偶数，sum为奇数则返回false
+        if ((sum & 1) == 1) return false;
+        int half = sum / 2;
+        // // boolean[][] dp = new boolean[nums.length][20001];
+        // // dp数组第二个维度可以优化为half+1
+        // boolean[][] dp = new boolean[nums.length][half + 1];
+        // dp[0][0] = true;
+        // // 这里注意，给dp[0][nums[0]]赋值时需要判断
+        // if (nums[0] <= half) dp[0][nums[0]] = true;
+        // for (int i = 1; i < dp.length; i++) {
+        //     for (int j = 0; j < dp[0].length; j++) {
+        //         dp[i][j] = dp[i-1][j] || (j >= nums[i] ? dp[i-1][j-nums[i]] : false);
+        //         if (dp[i][half]) return true;
+        //     }
+        // }
+        // return dp[nums.length - 1][half];
+
+        // 使用一维dp数组，对空间复杂度进行优化
+        boolean[] dp = new boolean[half + 1];
+        dp[0] = true;
+        if (nums[0] <= half) {
+            dp[nums[0]] = true;
+        }
+        for (int i = 1; i < nums.length; i++) {
+            // for (int j = dp.length - 1; j >= 0; j--) {
+            //     dp[j] = dp[j] || (j >= nums[i] ? dp[j-nums[i]] : false);
+            // }
+            // 上面的代码可以优化如下：
+            for (int j = dp.length - 1; j >= nums[i]; j--) {
+                // if (dp[j - nums[i]]) {
+                //     dp[j] = true;
+                // }
+                dp[j] = dp[j] || dp[j - nums[i]];
+                // 如果发现存在子集和为half，则可以直接返回true
+                if (dp[half]) return true;
+            }
+        }
+        return dp[half];
+    }
+}
