@@ -1,0 +1,150 @@
+给定一个由 '1'（陆地）和 '0'（水）组成的的二维网格，计算岛屿的数量。一个岛被水包围，并且它是通过水平方向或垂直方向上相邻的陆地连接而成的。你可以假设网格的四个边均被水包围。
+
+示例 1:
+
+输入:
+11110
+11010
+11000
+00000
+
+输出: 1
+示例 2:
+
+输入:
+11000
+11000
+00100
+00011
+
+输出: 3
+
+----------------------------------------------Code-----------------------------------------------------
+class Solution {
+    public int numIslands(char[][] grid) {
+        /*
+        // 思路一：图的深度优先搜索，找出连通图的数量即可
+        int count = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == '1') {
+                    help(grid, i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+        */
+
+        // 思路二：使用并查集
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+
+        UnionFind unionFind = new UnionFind(grid);
+        int m = grid.length;
+        int n = grid[0].length;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1') {
+                    // grid[i][j] = '0';
+                    // 四个方向进行搜索
+                    if (i - 1 >= 0 && grid[i-1][j] == '1') {
+                        unionFind.unionElements(i * n + j, (i-1) * n + j);
+                    }
+                    if (i + 1 < m && grid[i+1][j] == '1') {
+                        unionFind.unionElements(i * n + j, (i+1) * n + j);
+                    }
+                    if (j - 1 >= 0 && grid[i][j-1] == '1') {
+                        unionFind.unionElements(i * n + j, (i * n + j - 1));
+                    }
+                    if (j + 1 < n && grid[i][j+1] == '1') {
+                        unionFind.unionElements(i * n + j, (i * n + j + 1));
+                    }
+                }
+            }
+        }
+        return unionFind.getCount();
+    }
+
+    // public void help(char[][] grid, int i, int j) {
+    //     // 以grid[i][j]为起点开始进行深度优先搜索
+    //     // 将搜索过的节点标记为'0'，这样可以节省visted数组的空间
+    //     grid[i][j] = '0';
+    //     int[][] offset = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    //     for (int k = 0; k < offset.length; k++) {
+    //         int newX = i + offset[k][0];
+    //         int newY = j + offset[k][1];
+    //         if (inArea(grid, newX, newY) && grid[newX][newY] == '1') {
+    //             help(grid, newX, newY);
+    //         }
+    //     }
+    // }
+
+    // public boolean inArea(char[][] grid, int i, int j) {
+    //     return i >=0 && i < grid.length && j >= 0 && j < grid[0].length;
+    // }
+
+    // 思路二：并查集类
+    class UnionFind {
+        
+        // 基于高度的并查集实现，count记录有多少组
+        private int[] parent;
+        private int[] rank;
+        private int count;
+
+        public UnionFind(char[][] grid) {
+            count = 0;
+            int m = grid.length;
+            int n = grid[0].length;
+            parent = new int[m * n];
+            rank = new int[m * n];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (grid[i][j] == '1') {
+                        // 注意这里parent[0]是0
+                        parent[i * n + j] = i * n + j;
+                        rank[i * n + j] = 1;
+                        count++;
+                    }
+                }
+            }
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        // 查找方法
+        public int find(int index) {
+            while (index != parent[index]) {
+                index = parent[index];
+            }
+            return index;
+        }
+
+        // 判断两个数是否在同一组，这个方法不需要
+        // public boolean isConnected(int firstIndex, int secondIndex) {
+        //     return find(firstIndex) == find(secondIndex);
+        // }
+
+        // 合并方法
+        public void unionElements(int firstIndex, int secondIndex) {
+            int firstRoot = find(firstIndex);
+            int secondRoot = find(secondIndex);
+            // 如果两个节点在同一组别中，则不用继续合并
+            // 注意这行代码可以省略，但是省略会导致count计算错误
+            if (firstRoot == secondRoot) return;
+            if (rank[firstRoot] > rank[secondRoot]) {
+                parent[secondRoot] = firstRoot;
+            } else if (rank[firstRoot] < rank[secondRoot]) {
+                parent[firstRoot] = secondRoot;
+            } else {
+                parent[firstRoot] = secondRoot;
+                rank[firstRoot] += 1;
+            }
+            // 注意，每次合并不同组别数量都会减一
+            count--;
+        }
+    }
+}
