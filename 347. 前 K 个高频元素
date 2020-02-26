@@ -1,0 +1,51 @@
+给定一个非空的整数数组，返回其中出现频率前 k 高的元素。
+
+示例 1:
+
+输入: nums = [1,1,1,2,2,3], k = 2
+输出: [1,2]
+示例 2:
+
+输入: nums = [1], k = 1
+输出: [1]
+说明：
+
+你可以假设给定的 k 总是合理的，且 1 ≤ k ≤ 数组中不相同的元素的个数。
+你的算法的时间复杂度必须优于 O(n log n) , n 是数组的大小。
+
+--------------------------------------------Code------------------------------------------------
+class Solution {
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        // 将nums数组每个元素出现次数存入nums
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+
+        // 构造优先队列(最小堆),最小堆依据该数出现次数排序，所以要自定义
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>(new Comparator<>() {
+            @Override
+            public int compare(Integer i1, Integer i2) {
+                return map.get(i1) - map.get(i2);
+            }
+        });
+
+        // 注意：求前k个最大值要构造最小堆，然后维护k个节点的最小堆，这样时间复杂度更低
+        // 构造最大堆，则需要维护n个节点，时间复杂度比维护k个节点高
+        Set<Integer> keySet = map.keySet();
+        for (Integer key : keySet) {
+            pq.offer(key);
+            if (pq.size() > k) {
+                pq.poll();
+            }
+        }
+
+        List<Integer> res = new ArrayList<>();
+        while (!pq.isEmpty()) {
+            res.add(pq.poll());
+        }
+        // 因为是最小堆，所以需要将结果反转
+        Collections.reverse(res);
+        return res;
+    }
+}
