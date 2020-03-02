@@ -1,0 +1,62 @@
+给定一个无序的整数数组，找到其中最长上升子序列的长度。
+
+示例:
+
+输入: [10,9,2,5,3,7,101,18]
+输出: 4 
+解释: 最长的上升子序列是 [2,3,7,101]，它的长度是 4。
+说明:
+
+可能会有多种最长上升子序列的组合，你只需要输出对应的长度即可。
+你算法的时间复杂度应该为 O(n2) 。
+进阶: 你能将算法的时间复杂度降低到 O(n log n) 吗?
+
+-------------------------------------------Code------------------------------------------
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        // 动态规划O(n2)解法
+        // dp[i]表示以nums[i]结尾的最长上升子序列长度
+        // if (nums == null || nums.length == 0) return 0;
+        // int[] dp = new int[nums.length];
+        // Arrays.fill(dp, 1);
+        // int res = 1;
+        // for (int i = 1; i < dp.length; i++) {
+        //     for (int j = 0; j < i; j++) {
+        //         if (nums[i] > nums[j]) {
+        //             dp[i] = Math.max(dp[i], dp[j] + 1);
+        //         }
+        //     }
+        //     res = Math.max(res, dp[i]);
+        // }
+        // return res;
+
+        // 动态规划+二分查找 时间复杂度O(nlogn)
+        // tail[i]表示长度为i+1的子序列尾部元素最小值
+        if (nums == null || nums.length == 0) return 0;
+        int[] tail = new int[nums.length];
+        tail[0] = nums[0];
+        int end = 0;
+        for (int num : nums) {
+            if (tail[end] < num) {
+                tail[end+1] = num;
+                end++;
+            } else {
+                int left = 0;
+                int right = end;
+                // 二分查找
+                while (left <= right) {
+                    int mid = (left + right) / 2;
+                    if (tail[mid] >= num && (mid == 0 || tail[mid-1] < num)) {
+                        tail[mid] = num;
+                        break;
+                    } else if (tail[mid] < num) {
+                        left = mid + 1;
+                    } else {
+                        right = mid - 1;
+                    }
+                }
+            }
+        }
+        return end + 1;
+    }
+}
