@@ -1,0 +1,58 @@
+给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），每段绳子的长度记为 k[0],k[1]...k[m] 。请问 k[0]*k[1]*...*k[m] 可能的最大乘积是多少？例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
+
+示例 1：
+
+输入: 2
+输出: 1
+解释: 2 = 1 + 1, 1 × 1 = 1
+示例 2:
+
+输入: 10
+输出: 36
+解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36
+提示：
+
+2 <= n <= 58
+
+----------------------------------------------Code-------------------------------------------------
+class Solution {
+    public int cuttingRope(int n) {
+        // 带记忆的递归
+        // int[] memo = new int[n+1];
+        // return help(n, memo);
+        // 动态规划
+        // dp[n]为长度为n的绳子所能剪出的最大乘积
+        // dp[n] = max(dp[n-1]*1, dp[n-2]*2,....., dp[1]*(n-1))
+        // int[] dp = new int[n+1];
+        // dp[2] = 1;
+        // for (int i = 0; i < dp.length; i++) {
+        //     for (int j = 1; j < i - 1; j++) {
+        //         int temp = Math.max(j * dp[i - j], j * (i - j));
+        //         dp[i] = Math.max(dp[i], temp);
+        //     }
+        // }
+        // return dp[n];
+
+        // 找规律
+        if (n == 2) return 1;
+        if (n == 3) return 2;
+        int a = n / 3, b = n % 3;
+        if (b == 0) return (int) Math.pow(3, a);
+        if (b == 1) return (int) Math.pow(3, a - 1) * 4;
+        return (int) Math.pow(3, a) * 2;
+    }
+
+    // private int help(int n, int[] memo) {
+    //     // 带记忆的递归
+    //     if (memo[n] != 0) return memo[n];
+    //     if (n == 2) return 1;
+    //     int res = 0;
+    //     for (int i = 1; i < n - 1; i++) {
+    //         int temp = help(n - i, memo);
+    //         memo[n-i] = temp;
+    //         // 注意这里要先判断i * temp 和 i * (n - i)的值的大小
+    //         res = Math.max(res, Math.max(i * temp, i * (n - i)));
+    //     }
+    //     return res;
+    // }
+}
