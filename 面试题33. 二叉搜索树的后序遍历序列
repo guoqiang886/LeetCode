@@ -1,0 +1,47 @@
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+
+ 
+
+参考以下这颗二叉搜索树：
+
+     5
+    / \
+   2   6
+  / \
+ 1   3
+示例 1：
+
+输入: [1,6,3,2,5]
+输出: false
+示例 2：
+
+输入: [1,3,2,6,5]
+输出: true
+
+------------------------------------------------Code------------------------------------------
+class Solution {
+    public boolean verifyPostorder(int[] postorder) {
+        // 递归+分治
+        return help(postorder, 0, postorder.length - 1);
+    }
+
+    public boolean help(int[] postorder, int start, int end) {
+        if (start >= end) return true;
+        int mid = end - 1;
+        // 找到左右子树在数组中的分界点
+        while (mid >= start && postorder[mid] > postorder[end]) {
+            mid--;
+        }
+        // 判断当前是否满足左子树的数值小于根节点，右子树值大于根节点
+        for (int i = start; i < end; i++) {
+            if (i <= mid && postorder[i] > postorder[end]) {
+                return false;
+            }
+            if (i > mid && postorder[i] < postorder[end]) {
+                return false;
+            }
+        }
+        // 递归去判断左右子树是否满足二叉搜索树规则
+        return help(postorder, start, mid) && help(postorder, mid + 1, end - 1);
+    } 
+}
