@@ -1,0 +1,32 @@
+统计一个数字在排序数组中出现的次数。
+
+ 
+
+示例 1:
+
+输入: nums = [5,7,7,8,8,10], target = 8
+输出: 2
+示例 2:
+
+输入: nums = [5,7,7,8,8,10], target = 6
+输出: 0
+
+-------------------------------------------Code----------------------------------------------
+class Solution {
+    public int search(int[] nums, int target) {
+        int low = 0, high = nums.length - 1;
+        // 二分搜索找到lower_bound
+        while (low < high) {
+            int mid = low + ((high - low) >> 1);
+            if (nums[mid] < target) low = mid + 1;
+            else high = mid;
+        }
+        // 从lower_bound向右搜索
+        int ans = 0;
+        while (low < nums.length && nums[low] == target) {
+            ans++;
+            low++;
+        }
+        return ans;
+    }
+}
