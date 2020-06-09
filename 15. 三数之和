@@ -1,0 +1,50 @@
+给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
+
+注意：答案中不可以包含重复的三元组。
+
+ 
+
+示例：
+
+给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+
+满足要求的三元组集合为：
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+
+------------------------------------------------Code--------------------------------------------------
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        Arrays.sort(nums); // 对数组先排序
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) break; // nums[i]为三个元素中最小的元素，如果大于0，则不存在和为0的三元组
+            if (i > 0 && nums[i] == nums[i - 1]) continue; // 重复，直接跳过
+            int left = i + 1, right = nums.length - 1; // 双指针搜索符合nums[left] + nums[right] = - nums[i]的元素，并且注意重复
+            while (left < right) {
+                if (nums[i] + nums[left] + nums[right] == 0) {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(nums[i]);
+                    list.add(nums[left]);
+                    list.add(nums[right]);
+                    ans.add(list); // 符合条件的三元组
+                    while (left < right && nums[left + 1] == nums[left]) {  // 排除重复情况
+                        left++;
+                    }
+                    while(left < right && nums[right - 1] == nums[right]) { // 排除重复情况
+                        right--;
+                    }
+                    left++;
+                    right--;
+                } else if (nums[i] + nums[left] + nums[right] < 0) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+        return ans;
+    }
+}
