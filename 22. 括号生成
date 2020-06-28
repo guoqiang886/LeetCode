@@ -1,0 +1,42 @@
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+
+ 
+
+示例：
+
+输入：n = 3
+输出：[
+       "((()))",
+       "(()())",
+       "(())()",
+       "()(())",
+       "()()()"
+     ]
+     
+------------------------------------------Code----------------------------------------------
+class Solution {
+    List<String> ans = new ArrayList<>();
+    public List<String> generateParenthesis(int n) {
+        help("", n, 0, 0);
+        return ans;
+    }
+
+    // left表示左括号用了多少个，right表示右括号用了多少个
+    public void help(String s, int n, int left, int right) {
+        if (left == n && right == n) {
+            ans.add(s);
+        }
+        // 左括号用的数量小于右括号用的数量就剪枝
+        // 其实判断括号是否匹配也是用的left和right大小来判断
+        if (left < right) {
+            return;
+        }
+        if (left < n) {
+            // 注意这里s + "("实际上是创建了一个新的对象，所以对后续s+")"没有影响
+            help(s + "(", n, left + 1, right);
+        }
+        if (right < n) {
+            help(s + ")", n, left, right + 1);
+        }
+    }
+}
